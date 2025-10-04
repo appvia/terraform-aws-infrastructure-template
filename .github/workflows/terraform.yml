@@ -1,0 +1,32 @@
+---
+name: Terraform
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  terraform:
+    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@main
+    name: Terraform Plan and Apply
+    secrets:
+      actions-id: "${{ secrets.ORG_ACTIONS_APP_ID }}"
+      actions-secret: "${{ secrets.ORG_ACTIONS_APP_SECRET }}"
+      infracost-api-key: ${{ secrets.ORG_INFRACOST_API_KEY }}
+    with:
+      ## Copies any additional directories into the apply stage
+      # additional-dir: builds
+      ## Allows the additional directories to be empty
+      # additional-dir-optional: true
+      aws-account-id: <ACCOUNT_ID>
+      enable-infracost: true
+      enable-private-access: true
