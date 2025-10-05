@@ -3,15 +3,47 @@ variable "tags" {
   type        = map(string)
 }
 
+variable "workloads_repository_name" {
+  description = "The name of the repository used to store the workload definitions"
+  type        = string
+}
+
 variable "cluster_name" {
   description = "The name of the cluster to provision"
   type        = string
 }
 
-variable "cluster_version" {
+variable "kubernetes_version" {
   description = "The version of the cluster to provision"
   type        = string
   default     = "1.32"
+}
+
+variable "github_template" {
+  description = "The owner of the GitHub template"
+  type = object({
+    owner      = string
+    repository = string
+  })
+  default = {
+    owner      = "appvia"
+    repository = "container-platform-template"
+  }
+}
+
+variable "github_app_id" {
+  description = "The ID of the GitHub App"
+  type        = string
+}
+
+variable "github_app_installation_id" {
+  description = "The installation ID of the GitHub App"
+  type        = string
+}
+
+variable "github_app_private_key" {
+  description = "The private key of the GitHub App"
+  type        = string
 }
 
 variable "access_entries" {
@@ -86,7 +118,7 @@ variable "argocd_repositories" {
   default = {}
 }
 
-variable "cluster_endpoint_public_access" {
+variable "endpoint_public_access" {
   description = "The public access to the cluster endpoint"
   type        = bool
   default     = true
@@ -97,20 +129,9 @@ variable "cluster_path" {
   type        = string
 }
 
-variable "enable_external_secrets" {
-  description = "Indicates we should enable the external secrets platform"
-  type        = bool
-  default     = true
-}
 
 variable "enable_platform" {
   description = "Indicates we should install the platform"
-  type        = bool
-  default     = true
-}
-
-variable "enable_terranetes" {
-  description = "Indicates we should enable the terranetes platform"
   type        = bool
   default     = true
 }
@@ -121,13 +142,20 @@ variable "hub_account_id" {
   default     = null
 }
 
-variable "tags" {
-  description = "The tags to apply to all resources"
-  type        = map(string)
+variable "hub_account_role" {
+  description = "The role to use for the hub account"
+  type        = string
+  default     = "argocd-pod-identity-hub"
 }
 
-variable "vpc_id" {
-  description = "The VPC ID when using an existing VPC"
+variable "vpc_name" {
+  description = "The ID of the VPC to deploy the cluster into"
   type        = string
-  default     = null
+  default     = "lz-main"
+}
+
+variable "revision_overrides" {
+  description = "The revision overrides to use for the platform and tenant repositories"
+  type        = map(string)
+  default     = {}
 }
