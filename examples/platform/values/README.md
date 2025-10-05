@@ -1,5 +1,3 @@
-# Infrastructure Pipeline
-
 <!-- BEGIN_TF_DOCS -->
 ## Providers
 
