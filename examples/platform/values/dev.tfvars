@@ -2,13 +2,8 @@
 #workloads_repository_name = UPDATE ME
 # The name of the cluster to provision
 cluster_name = "eks-dev"
-## Path to the cluster definition
-cluster_path = "assets/cluster.yaml"
 ## Override revision or branch for the platform and tenant repositories
-revision_overrides = {
-  platform_revision = "main"
-  tenant_revision   = "main"
-}
+revision_overrides = {}
 # Indicates if we should enable the platform
 enable_platform = true
 ## Tags to apply to the EKS cluster

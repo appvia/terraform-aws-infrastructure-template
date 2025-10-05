@@ -84,6 +84,14 @@ validate-examples:
 		terraform -chdir=$$dir validate; \
 	done; 
 
+validate-workflows:
+	@echo "--> Validating GitHub Workflows"
+	@command -v actionlint >/dev/null 2>&1 || { echo "actionlint is not installed. Please install it by running 'make install-tools'"; exit 1; }
+	@find . -type d -path '*/.github/workflows/*' -not -path '*.terraform*' 2>/dev/null | while read -r dir; do \
+		echo "--> Validating $$dir"; \
+		actionlint $$dir; \
+	done;
+
 validate:
 	@echo "--> Running terraform validate"
 	@terraform init -backend=false
@@ -95,6 +103,7 @@ validate:
 	$(MAKE) validate-examples
 	$(MAKE) lint-examples
 	$(MAKE) security-examples
+	$(MAKE) validate-workflows
 
 clean:
 	@echo "--> Cleaning up"

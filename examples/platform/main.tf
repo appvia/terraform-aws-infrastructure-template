@@ -7,22 +7,23 @@
 #
 
 ## Provision a repository used to store the application workloads definitions
-module "workloads_repository" {
+module "tenant_repository" {
+  count   = var.tenant_repository.create ? 1 : 0
   source  = "appvia/repository/github"
   version = "1.1.2"
 
-  repository  = var.workloads_repository_name
-  description = format("Infrastructure repository for the %s landing zone.", var.workloads_repository_name)
-  visibility  = "private"
+  repository  = basename(var.tenant_repository.repository)
+  description = local.tenant_repository_description
+  visibility  = var.tenant_repository.visibility
 
   # Template settings
-  template = {
-    owner      = var.github_template.owner
-    repository = var.github_template.repository
-  }
+  template = var.tenant_repository.template != null ? {
+    owner      = var.tenant_repository.template.owner
+    repository = var.tenant_repository.template.repository
+  } : null
 
   # Branch rules 
-  allow_auto_merge       = false
+  allow_auto_merge       = true
   allow_merge_commit     = true
   allow_rebase_merge     = true
   allow_squash_merge     = true
@@ -66,6 +67,11 @@ module "eks" {
   tags                   = local.tags
   vpc_id                 = local.vpc_id
 
+  ## Hub-Spoke configuration - if the cluster is part of a hub-spoke architecture, update the 
+  ## following variables
+  hub_account_id   = var.hub_account_id
+  hub_account_role = var.hub_account_role
+
   ## Certificate manager configuration
   cert_manager = {
     enabled         = true
@@ -99,11 +105,6 @@ module "eks" {
     route53_zone_arns = []
   }
 
-  ## Hub-Spoke configuration - if the cluster is part of a hub-spoke architecture, update the 
-  ## following variables
-  hub_account_id   = var.hub_account_id
-  hub_account_role = var.hub_account_role
-
   depends_on = [module.workloads_repository]
 }
 
@@ -113,23 +114,23 @@ module "platform" {
   source = "github.com/gambol99/terraform-kube-platform?ref=v0.1.3"
 
   ## Name of the cluster
-  cluster_name = local.cluster_name
+  cluster_name = var.cluster_name
   # The type of cluster
-  cluster_type = local.cluster_type
+  cluster_type = var.cluster_type
   # Any rrepositories to be provisioned
   repositories = var.argocd_repositories
   ## Revision overrides
   revision_overrides = var.revision_overrides
   ## The platform repository
-  platform_repository = local.platform_repository
+  platform_repository = var.platform.repository
   # The location of the platform repository
-  platform_revision = local.platform_revision
+  platform_revision = var.platform.revision
   # The location of the tenant repository
-  tenant_repository = local.tenant_repository
+  tenant_repository = var.tenant_repository.repository
   # You pretty much always want to use the HEAD
-  tenant_revision = local.tenant_revision
+  tenant_revision = "main"
   ## The tenant repository path
-  tenant_path = local.tenant_path
+  tenant_path = "."
 
   depends_on = [
     module.eks

@@ -1,3 +1,4 @@
+
 locals {
   ## Additional access entries to add to the cluster
   ## Documentation: https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_access_settings
@@ -12,16 +13,6 @@ locals {
           }
         }
       }
-    }
-  })
-
-  ## Additional pod identity configuration
-  ## Documentation: https://registry.terraform.io/providers/terraform-aws-modules/eks/latest/docs/modules/pod_identity
-  pod_identity = merge(var.pod_identity, {
-    eks_admin = {
-      enabled         = true
-      namespace       = "eks-admin"
-      service_account = "eks-admin"
     }
   })
 }

@@ -1,12 +1,18 @@
 ---
 name: Terraform
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      enable-plan:
+        description: "Whether to run the plan step"
+        required: true
+        type: boolean
+        default: true
+      enable-apply:
+        description: "Whether to run the infracost step"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,4 +35,5 @@ jobs:
       aws-account-id: <ACCOUNT_ID>
       enable-infracost: true
       enable-private-access: true
-      terraform-values-file: values/dev.tfvars
+      enable-plan: ${{ inputs.enable-plan }}
+      enable-apply: ${{ inputs.enable-apply }}

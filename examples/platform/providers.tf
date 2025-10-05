@@ -6,6 +6,3 @@ provider "github" {
     pem_file        = var.github_app_private_key
   }
 }
-
-## Configure the AWS provider
-provider "aws" {}

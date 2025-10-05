@@ -3,9 +3,39 @@ variable "tags" {
   type        = map(string)
 }
 
-variable "workloads_repository_name" {
-  description = "The name of the repository used to store the workload definitions"
+variable "tenant_repository" {
+  description = "Configuration for the tenant repository, containing application definitions"
+  type = object({
+    # The name of the repository (the full url of the repository)
+    repository = string
+    # The description of the repository
+    description = string
+    # The visibility of the repository (private, public, etc.)
+    visibility = optional(string, "private")
+    # Whether to create the repository
+    create = optional(bool, false)
+  })
+  default = {
+    description = null
+  }
+}
+
+variable "cluster_type" {
+  description = "The type of cluster to provision on the platform i.e (hub, spoke)"
   type        = string
+  default     = "spoke"
+}
+
+variable "platform" {
+  description = "The platform configuration"
+  type = object({
+    repository = string
+    revision   = string
+  })
+  default = {
+    repository = "https://github.com/appvia/terraform-kube-platform"
+    revision   = "v0.1.3"
+  }
 }
 
 variable "cluster_name" {
@@ -157,5 +187,5 @@ variable "vpc_name" {
 variable "revision_overrides" {
   description = "The revision overrides to use for the platform and tenant repositories"
   type        = map(string)
-  default     = {}
+  default     = null
 }
