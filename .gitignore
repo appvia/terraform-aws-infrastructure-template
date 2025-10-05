@@ -25,13 +25,14 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+.terraform.lock.hcl
 
-# Ignore vim swap files 
-*.swp 
-*.swo 
+# Ignore vim swap files
+*.swp
+*.swo
 
-# Irgnore meld diff files 
-*.orig 
-*.backup 
-*.rej 
+# Irgnore meld diff files
+*.orig
+*.backup
+*.rej
 
