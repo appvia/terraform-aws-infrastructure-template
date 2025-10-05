@@ -10,7 +10,7 @@
 module "tenant_repository" {
   count   = var.tenant_repository.create ? 1 : 0
   source  = "appvia/repository/github"
-  version = "1.1.2"
+  version = "1.1.3"
 
   repository  = basename(var.tenant_repository.repository)
   description = local.tenant_repository_description
