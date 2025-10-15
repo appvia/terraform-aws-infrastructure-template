@@ -7,8 +7,10 @@
 #
 
 ## Provision a repository used to store the application workloads definitions
+## Optional - only required if you want the tenant repository to be created in a 
+## separate repository to infrastructure pipeline
 module "tenant_repository" {
-  count   = var.tenant_repository.create ? 1 : 0
+  count   = local.create_tenant_repository ? 1 : 0
   source  = "appvia/repository/github"
   version = "1.1.2"
 
@@ -31,11 +33,16 @@ module "tenant_repository" {
 
   branch_protection = {
     main = {
-      allows_force_pushes             = false
-      allows_deletions                = false
+      # Disable force pushes, deletions, and merge commits
+      allows_force_pushes = false
+      # Disable deletions of the main branch
+      allows_deletions = false
+      # Require conversation resolution
       require_conversation_resolution = true
-      require_signed_commits          = true
-      required_linear_history         = false
+      # Require signed commits
+      require_signed_commits = true
+      # Disable linear history
+      required_linear_history = false
 
       required_status_checks = {
         strict   = true
@@ -52,15 +59,47 @@ module "tenant_repository" {
   }
 }
 
+## Provision a network for the cluster
+module "network" {
+  source  = "appvia/network/aws"
+  version = "0.6.12"
+
+  availability_zones     = var.availability_zones
+  name                   = var.cluster_name
+  private_subnet_netmask = var.private_subnet_netmask
+  ipam_pool_id           = local.ipam_pool_id
+  tags                   = local.tags
+  transit_gateway_id     = local.transit_gateway_id
+  vpc_cidr               = var.vpc_cidr
+
+  # By default we route all traffic to the transit gateway
+  transit_gateway_routes = {
+    private = "0.0.0.0/0"
+  }
+
+  private_subnet_tags = {
+    "karpenter.sh/discovery"                    = var.cluster_name
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/role/internal-elb"           = "1"
+  }
+
+  ## Assuming public subnets are being provisioned, we tag them with the cluster name
+  public_subnet_tags = var.public_subnet_netmask > 0 ? {
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
+    "kubernetes.io/role/elb"                    = "1"
+  } : null
+}
+
 ## Provision an EKS container platform to deploy workloads
 module "eks" {
   source  = "appvia/eks/aws"
-  version = "1.0.0"
+  version = "1.2.1"
 
   access_entries         = local.access_entries
   cluster_name           = var.cluster_name
-  endpoint_public_access = var.endpoint_public_access
-  kms_key_administrators = [local.root_user_arn]
+  enable_private_access  = true
+  enable_public_access   = var.enable_public_access
+  kms_key_administrators = [local.root_account_arn]
   kubernetes_version     = var.kubernetes_version
   pod_identity           = local.pod_identity
   private_subnet_ids     = data.aws_subnets.private_subnets.ids
@@ -77,7 +116,7 @@ module "eks" {
     enabled         = true
     namespace       = "cert-manager"
     service_account = "cert-manager"
-    # Route53 zone ARNs to attach to the Certificate Manager platform
+    # Update to include Route53 zone ARNs to attach to the Certificate Manager platform
     route53_zone_arns = []
   }
 
@@ -101,7 +140,7 @@ module "eks" {
     enabled         = true
     namespace       = "external-dns"
     service_account = "external-dns"
-    # Route53 zone ARNs to attach to the External DNS platform
+    # Update to include Route53 zone ARNs to attach to the External DNS platform
     route53_zone_arns = []
   }
 
@@ -110,8 +149,9 @@ module "eks" {
 
 ## Provision and bootstrap the platform using an tenant repository
 module "platform" {
-  count  = var.enable_platform ? 1 : 0
-  source = "github.com/gambol99/terraform-kube-platform?ref=v0.1.3"
+  count   = var.enable_platform ? 1 : 0
+  source  = "appvia/eks/aws//modules/platform"
+  version = "1.2.1"
 
   ## Name of the cluster
   cluster_name = var.cluster_name
@@ -119,18 +159,16 @@ module "platform" {
   cluster_type = var.cluster_type
   # Any rrepositories to be provisioned
   repositories = var.argocd_repositories
-  ## Revision overrides
-  revision_overrides = var.revision_overrides
-  ## The platform repository
-  platform_repository = var.platform.repository
-  # The location of the platform repository
-  platform_revision = var.platform.revision
+  ## The platform repository - this is needed purely for the bootstraping the application
+  platform_repository = try(var.platform.repository, "https://github.com/appvia/kubernetes-platform")
+  # The location of the platform repository - this is needed purely for the bootstraping the application
+  platform_revision = try(var.platform.revision, "main")
   # The location of the tenant repository
-  tenant_repository = var.tenant_repository.repository
+  tenant_repository = local.tenant_repository_url
   # You pretty much always want to use the HEAD
-  tenant_revision = "main"
+  tenant_revision = try(var.tenant_repository.revision, "main")
   ## The tenant repository path
-  tenant_path = "."
+  tenant_path = local.tenant_repository_path
 
   depends_on = [
     module.eks

@@ -1,0 +1,44 @@
+## The name of the tenant cluster
+cluster_name: prod
+## The cloud vendor to use for the tenant cluster
+cloud_vendor: aws
+## The environment to use for the tenant cluster
+environment: release
+## The repository containing the tenant configuration
+tenant_repository: https://github.com/appvia/terraform-aws-infrastructure-template.git
+## The revision to use for the tenant repository
+tenant_revision: main
+## The path inside the tenant repository to use for the tenant cluster
+tenant_path: examples/platform/release
+## The cost center to use for the tenant cluster
+tenant_cost_center: "Engineering"
+## The repository containing the platform configuration
+platform_repository: https://github.com/appvia/kubernetes-platform.git
+## The revision to use for the platform repository
+platform_revision: v0.2.12
+## The path to the kustomize overlay to use for the tenant cluster
+platform_path: overlays/release
+## The type of cluster we are (standalone, spoke or hub)
+cluster_type: standalone
+## The name of the tenant
+tenant: tenant
+## We use labels to enable/disable features in the tenant cluster
+labels:
+  # Enable certificate management within the tenant cluster
+  enable_cert_manager: "true"
+  # Enable Cilium for network policy management
+  enable_cilium: "true"
+  # Enable external secrets for secret management
+  enable_external_secrets: "true"
+  # Enable Karpenter nodepools for autoscaling
+  enable_karpenter_nodepools: "true"
+  # Enable KRO for custom resource management
+  enable_kro: "true"
+  # Enable Kyverno for policy management
+  enable_kyverno: "true"
+## Annotations are using for additional metadata about the tenant cluster
+annotations:
+  platform.local/tenant: tenant
+  platform.local/environment: production
+## The authentication details for the cluster
+cluster_authentication: {}

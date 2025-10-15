@@ -1,0 +1,37 @@
+---
+name: Terraform
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+env:
+  TF_VAR_github_app_id: "${{ secrets.ORG_ACTIONS_APP_ID }}"
+  TF_VAR_github_app_installation_id: "${{ secrets.ORG_ACTIONS_APP_INSTALLATION_ID }}"
+  TF_VAR_github_app_private_key: "${{ secrets.ORG_ACTIONS_APP_PRIVATE_KEY }}"
+
+jobs:
+  terraform:
+    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@main
+    name: Terraform Plan and Apply
+    secrets:
+      actions-id: "${{ secrets.ORG_ACTIONS_APP_ID }}"
+      actions-secret: "${{ secrets.ORG_ACTIONS_APP_SECRET }}"
+      infracost-api-key: "${{ secrets.ORG_INFRACOST_API_KEY }}"
+    with:
+      ## Copies any additional directories into the apply stage
+      # additional-dir: builds
+      ## Allows the additional directories to be empty
+      # additional-dir-optional: true
+      aws-account-id: <ACCOUNT_ID>
+      enable-infracost: true
+      enable-private-access: true
+      terraform-values-file: values/dev.tfvars

@@ -19,3 +19,21 @@ data "aws_vpc" "current" {
     values = [var.vpc_name]
   }
 }
+
+## Find the regional transit gateway
+data "aws_ec2_transit_gateway" "current" {
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+}
+
+## Find the IPAM pool by description
+data "aws_vpc_ipam_pool" "current" {
+  count = var.ipam_pool_name != null ? 1 : 0
+
+  filter {
+    name   = "description"
+    values = [var.ipam_pool_name]
+  }
+}

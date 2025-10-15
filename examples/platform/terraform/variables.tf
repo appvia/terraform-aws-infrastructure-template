@@ -3,6 +3,48 @@ variable "tags" {
   type        = map(string)
 }
 
+variable "availability_zones" {
+  description = "The availability zones to provision the cluster in"
+  type        = number
+  default     = 3
+}
+
+variable "private_subnet_netmask" {
+  description = "The netmask for the private subnets"
+  type        = number
+  default     = 24
+}
+
+variable "public_subnet_netmask" {
+  description = "The netmask for the public subnets"
+  type        = number
+  default     = 0
+}
+
+variable "enable_public_access" {
+  description = "Indicates we should enable public access to the cluster"
+  type        = bool
+  default     = false
+}
+
+variable "transit_gateway_id" {
+  description = "The transit gateway ID to associate with the network"
+  type        = string
+  default     = null
+}
+
+variable "vpc_cidr" {
+  description = "The CIDR block for the VPC"
+  type        = string
+  default     = null
+}
+
+variable "ipam_pool_name" {
+  description = "The name of the IPAM pool to use for the network"
+  type        = string
+  default     = null
+}
+
 variable "tenant_repository" {
   description = "Configuration for the tenant repository, containing application definitions"
   type = object({
@@ -15,9 +57,7 @@ variable "tenant_repository" {
     # Whether to create the repository
     create = optional(bool, false)
   })
-  default = {
-    description = null
-  }
+  default = null
 }
 
 variable "cluster_type" {
@@ -33,7 +73,7 @@ variable "platform" {
     revision   = string
   })
   default = {
-    repository = "https://github.com/appvia/terraform-kube-platform"
+    repository = "https://github.com/appvia/kubernetes-platform"
     revision   = "v0.1.3"
   }
 }
@@ -46,7 +86,7 @@ variable "cluster_name" {
 variable "kubernetes_version" {
   description = "The version of the cluster to provision"
   type        = string
-  default     = "1.32"
+  default     = "1.34"
 }
 
 variable "github_template" {
@@ -64,16 +104,19 @@ variable "github_template" {
 variable "github_app_id" {
   description = "The ID of the GitHub App"
   type        = string
+  default     = null
 }
 
 variable "github_app_installation_id" {
   description = "The installation ID of the GitHub App"
   type        = string
+  default     = null
 }
 
 variable "github_app_private_key" {
   description = "The private key of the GitHub App"
   type        = string
+  default     = null
 }
 
 variable "access_entries" {
@@ -158,7 +201,6 @@ variable "cluster_path" {
   description = "The name of the cluster"
   type        = string
 }
-
 
 variable "enable_platform" {
   description = "Indicates we should install the platform"
