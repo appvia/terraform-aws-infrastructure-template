@@ -93,7 +93,8 @@ module "network" {
 
 ## Provision an EKS container platform to deploy workloads
 module "eks" {
-  source = "github.com/appvia/terraform-aws-eks?ref=dev"
+  source  = "appvia/eks/aws"
+  version = "1.2.2"
 
   access_entries         = local.access_entries
   cluster_name           = var.cluster_name
@@ -151,7 +152,7 @@ module "eks" {
 module "platform" {
   count   = var.enable_platform ? 1 : 0
   source  = "appvia/eks/aws//modules/platform"
-  version = "1.2.1"
+  version = "1.2.2"
 
   ## Name of the cluster
   cluster_name = module.eks.cluster_name

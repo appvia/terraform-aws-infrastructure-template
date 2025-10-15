@@ -18,6 +18,28 @@ permissions:
   pull-requests: write
 
 jobs:
+  # Create a matrix of jobs for the dev and prod accounts
+  #  terraform-matrix:
+  #    name: Terraform Matrix
+  #    runs-on: ubuntu-latest
+  #    strategy:
+  #      matrix:
+  #        account:
+  #          - { account-id: <DEV_ACCOUNT_ID>, values-file: values/dev.tfvars }
+  #          - { account-id: <PROD_ACCOUNT_ID>, values-file: values/prod.tfvars }
+  #
+  #    steps:
+  #      - name: Checkout Repository
+  #        uses: actions/checkout@v4
+  #
+  #      - name: Terraform Plan and Apply
+  #        uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@main
+  #        with:
+  #          aws-account-id: ${{ matrix.account.account-id }}
+  #          enable-private-access: true
+  #          terraform-values-file: ${{ matrix.account.values-file }}
+  #          terraform-dir: terraform
+
   terraform:
     uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@main
     name: Terraform Plan and Apply
