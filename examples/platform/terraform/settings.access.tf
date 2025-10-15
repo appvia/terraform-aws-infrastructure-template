@@ -1,13 +1,16 @@
 
 locals {
+  ## The SSO Administrator role ARN
+  sso_role_name = "AWSReservedSSO_Administrator_fbb916977087a86f"
+
   ## Additional access entries to add to the cluster
   ## Documentation: https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_access_settings
   access_entries = merge(var.access_entries, {
-    eks_admin = {
-      principal_arn = "arn:aws:iam::${local.account_id}:user/eks-admin"
+    admin = {
+      principal_arn = format("arn:aws:iam::%s:role/aws-reserved/sso.amazonaws.com/eu-west-2/%s", local.account_id, local.sso_role_name)
       policy_associations = {
-        admin = {
-          policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+        cluster_admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
           access_scope = {
             type = "cluster"
           }

@@ -1,6 +1,8 @@
 locals {
   ## The current AWS account ID
   account_id = data.aws_caller_identity.current.account_id
+  # The current region
+  region = data.aws_region.current.region
   ## AWS Root user ARN
   root_account_arn = format("arn:aws:iam::%s:root", local.account_id)
   ## The tags to apply to all resources

@@ -93,8 +93,7 @@ module "network" {
 
 ## Provision an EKS container platform to deploy workloads
 module "eks" {
-  source  = "appvia/eks/aws"
-  version = "1.2.1"
+  source = "github.com/appvia/terraform-aws-eks?ref=dev"
 
   access_entries         = local.access_entries
   cluster_name           = var.cluster_name
@@ -114,11 +113,10 @@ module "eks" {
 
   ## Certificate manager configuration
   cert_manager = {
-    enabled         = true
-    namespace       = "cert-manager"
-    service_account = "cert-manager"
-    # Update to include Route53 zone ARNs to attach to the Certificate Manager platform
-    route53_zone_arns = []
+    enabled          = true
+    namespace        = "cert-manager"
+    service_account  = "cert-manager"
+    hosted_zone_arns = ["arn:aws:route53:::hostedzone/*"]
   }
 
   ## ArgoCD configuration
@@ -132,17 +130,16 @@ module "eks" {
     enabled              = true
     namespace            = "external-secrets"
     service_account      = "external-secrets"
-    secrets_manager_arns = ["arn:aws:secretsmanager:*:*"]
-    ssm_parameter_arns   = ["arn:aws:ssm:*:*:parameter/eks/*"]
+    secrets_manager_arns = ["arn:aws:secretsmanager:::secret/*"]
+    ssm_parameter_arns   = ["arn:aws:ssm:::parameter/eks/*"]
   }
 
   ## External DNS configuration
   external_dns = {
-    enabled         = true
-    namespace       = "external-dns"
-    service_account = "external-dns"
-    # Update to include Route53 zone ARNs to attach to the External DNS platform
-    route53_zone_arns = []
+    enabled          = true
+    namespace        = "external-dns"
+    service_account  = "external-dns"
+    hosted_zone_arns = ["arn:aws:route53:::hostedzone/*"]
   }
 
   depends_on = [
