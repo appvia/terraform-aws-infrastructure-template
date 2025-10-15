@@ -103,7 +103,7 @@ module "eks" {
   kms_key_administrators = [local.root_account_arn]
   kubernetes_version     = var.kubernetes_version
   pod_identity           = local.pod_identity
-  private_subnet_ids     = data.aws_subnets.private_subnets.ids
+  private_subnet_ids     = local.private_subnet_ids
   tags                   = local.tags
   vpc_id                 = local.vpc_id
 
