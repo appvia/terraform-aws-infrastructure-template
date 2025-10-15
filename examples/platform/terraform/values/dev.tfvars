@@ -1,11 +1,9 @@
-# The name of the repository used to store the workload definitions 
-#workloads_repository_name = UPDATE ME
 # The name of the cluster to provision
-cluster_name = "eks-dev"
-## Override revision or branch for the platform and tenant repositories
-revision_overrides = {}
+cluster_name = "dev"
 # Indicates if we should enable the platform
 enable_platform = true
+# Indicates if we should enable the public access to the cluster (not recommended for production)
+enable_public_access = true
 ## Tags to apply to the EKS cluster
 tags = {
   # Name of the environment we are deploying to

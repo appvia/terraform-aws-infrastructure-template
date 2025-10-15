@@ -14,6 +14,8 @@ data "aws_subnets" "private_subnets" {
 
 # Find the VPC by name
 data "aws_vpc" "current" {
+  count = var.vpc_name != null ? 1 : 0
+
   filter {
     name   = "tag:Name"
     values = [var.vpc_name]

@@ -8,9 +8,9 @@ locals {
   ## The default description of the tenant repository if none is provided
   tenant_repository_default_description = format("Application definitions for the %s cluster.", var.cluster_name)
   ## The description of the tenant repository
-  tenant_repository_description = var.tenant_repository.description == null ? local.tenant_repository_default_description : var.tenant_repository.description
+  tenant_repository_description = try(var.tenant_repository.description, null) == null ? local.tenant_repository_default_description : try(var.tenant_repository.description, null)
   ## Find the vpc id from the subnets
-  vpc_id = data.aws_vpc.current.id
+  vpc_id = var.vpc_name != null ? try(data.aws_vpc.current[0].id, null) : module.network[0].vpc_id
   ## We use the transit gateway ID passed into the module if provided, otherwise we use the regional transit gateway
   transit_gateway_id = var.transit_gateway_id != null ? var.transit_gateway_id : data.aws_ec2_transit_gateway.current.id
   ## Should we create the tenant repository

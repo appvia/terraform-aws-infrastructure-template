@@ -14,14 +14,15 @@ module "tenant_repository" {
   source  = "appvia/repository/github"
   version = "1.1.2"
 
-  repository  = basename(var.tenant_repository.repository)
-  description = local.tenant_repository_description
-  visibility  = var.tenant_repository.visibility
+  repository   = basename(try(var.tenant_repository.repository, ""))
+  description  = local.tenant_repository_description
+  visibility   = try(var.tenant_repository.visibility, "private")
+  environments = {}
 
   # Template settings
-  template = var.tenant_repository.template != null ? {
-    owner      = var.tenant_repository.template.owner
-    repository = var.tenant_repository.template.repository
+  template = try(var.tenant_repository.template, null) != null ? {
+    owner      = try(var.tenant_repository.template.owner, null)
+    repository = try(var.tenant_repository.template.repository, null)
   } : null
 
   # Branch rules 
@@ -30,7 +31,6 @@ module "tenant_repository" {
   allow_rebase_merge     = true
   allow_squash_merge     = true
   delete_branch_on_merge = true
-
   branch_protection = {
     main = {
       # Disable force pushes, deletions, and merge commits
@@ -61,6 +61,7 @@ module "tenant_repository" {
 
 ## Provision a network for the cluster
 module "network" {
+  count   = var.vpc_name == null ? 1 : 0
   source  = "appvia/network/aws"
   version = "0.6.12"
 
@@ -144,7 +145,9 @@ module "eks" {
     route53_zone_arns = []
   }
 
-  depends_on = [module.workloads_repository]
+  depends_on = [
+    module.tenant_repository,
+  ]
 }
 
 ## Provision and bootstrap the platform using an tenant repository
@@ -154,9 +157,7 @@ module "platform" {
   version = "1.2.1"
 
   ## Name of the cluster
-  cluster_name = var.cluster_name
-  # The type of cluster
-  cluster_type = var.cluster_type
+  cluster_name = module.eks.cluster_name
   # Any rrepositories to be provisioned
   repositories = var.argocd_repositories
   ## The platform repository - this is needed purely for the bootstraping the application
@@ -171,6 +172,6 @@ module "platform" {
   tenant_path = local.tenant_repository_path
 
   depends_on = [
-    module.eks
+    module.tenant_repository
   ]
 }
