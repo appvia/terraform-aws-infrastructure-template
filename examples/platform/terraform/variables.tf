@@ -115,7 +115,7 @@ variable "platform" {
   })
   default = {
     repository = "https://github.com/appvia/kubernetes-platform"
-    revision   = "v0.2.14"
+    revision   = "main"
   }
 }
 

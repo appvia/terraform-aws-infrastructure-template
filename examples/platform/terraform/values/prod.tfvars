@@ -2,6 +2,14 @@
 cluster_name = "prod"
 # Indicates if we should enable the platform
 enable_platform = true
+# The platform repository
+platform = {
+  # The platform repository
+  repository = "https://github.com/appvia/kubernetes-platform"
+  # The platform revision
+  revision = "v0.2.14"
+}
+
 ## Tags to apply to the EKS cluster
 tags = {
   # Name of the environment we are deploying to
