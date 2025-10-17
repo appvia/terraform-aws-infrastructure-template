@@ -2,12 +2,12 @@
 #
 ## Provision a Container Platform
 #
-# Uncomment the following resources to provision a container platform (EKS) if you 
+# Uncomment the following resources to provision a container platform (EKS) if you
 # are using the Platform pattern: https://github.com/appvia/kubernetes-platform
 #
 
 ## Provision a repository used to store the application workloads definitions
-## Optional - only required if you want the tenant repository to be created in a 
+## Optional - only required if you want the tenant repository to be created in a
 ## separate repository to infrastructure pipeline
 module "tenant_repository" {
   count   = local.create_tenant_repository ? 1 : 0
@@ -25,7 +25,7 @@ module "tenant_repository" {
     repository = try(var.tenant_repository.template.repository, null)
   } : null
 
-  # Branch rules 
+  # Branch rules
   allow_auto_merge       = true
   allow_merge_commit     = true
   allow_rebase_merge     = true
@@ -94,7 +94,7 @@ module "network" {
 ## Provision an EKS container platform to deploy workloads
 module "eks" {
   source  = "appvia/eks/aws"
-  version = "1.2.2"
+  version = "1.2.4"
 
   access_entries         = local.access_entries
   cluster_name           = var.cluster_name
@@ -107,7 +107,13 @@ module "eks" {
   tags                   = local.tags
   vpc_id                 = local.vpc_id
 
-  ## Hub-Spoke configuration - if the cluster is part of a hub-spoke architecture, update the 
+  addons = {
+    aws-ebs-csi-driver = {
+      addon_version = "v1.51.0-eksbuild.1"
+    }
+  }
+
+  ## Hub-Spoke configuration - if the cluster is part of a hub-spoke architecture, update the
   ## following variables
   hub_account_id   = var.hub_account_id
   hub_account_role = var.hub_account_role
@@ -152,7 +158,7 @@ module "eks" {
 module "platform" {
   count   = var.enable_platform ? 1 : 0
   source  = "appvia/eks/aws//modules/platform"
-  version = "1.2.2"
+  version = "1.2.4"
 
   ## Name of the cluster
   cluster_name = module.eks.cluster_name
