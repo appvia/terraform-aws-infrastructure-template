@@ -24,6 +24,8 @@ cluster_type: standalone
 tenant: tenant
 ## We use labels to enable/disable features in the tenant cluster
 labels:
+  # Enable Kubecost for cost management
+  enable_kubecost: "true"
   # Enable certificate management within the tenant cluster
   enable_cert_manager: "true"
   # Enable Cilium for network policy management
