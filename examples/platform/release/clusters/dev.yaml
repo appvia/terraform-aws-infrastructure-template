@@ -37,7 +37,7 @@ labels:
   # Enable KRO for custom resource management
   enable_kro: "true"
   # Enable Kyverno for policy management
-  enable_kyverno: "true"
+  enable_kyverno: "false"
 ## Annotations are using for additional metadata about the tenant cluster
 annotations:
   platform.local/environment: development
