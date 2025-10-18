@@ -1,8 +1,6 @@
 locals {
   ## The current AWS account ID
   account_id = data.aws_caller_identity.current.account_id
-  # The current region
-  region = data.aws_region.current.region
   ## AWS Root user ARN
   root_account_arn = format("arn:aws:iam::%s:root", local.account_id)
   ## The tags to apply to all resources
@@ -21,8 +19,8 @@ locals {
   create_tenant_repository = var.tenant_repository != null ? try(var.tenant_repository.create, false) : false
   ## The IPAM pool ID if the ipam pool name is provided
   ipam_pool_id = var.ipam_pool_name != null ? try(data.aws_vpc_ipam_pool.current[0].id, null) : null
-  ## The tenant repository URL 
+  ## The tenant repository URL
   tenant_repository_url = var.tenant_repository != null ? var.tenant_repository.repository : "https://github.com/appvia/terraform-aws-infrastructure-template"
-  ## The tenant repository path 
+  ## The tenant repository path
   tenant_repository_path = var.tenant_repository != null ? var.tenant_repository.path : "examples/platform/release"
 }
