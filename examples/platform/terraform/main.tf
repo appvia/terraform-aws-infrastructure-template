@@ -25,12 +25,18 @@ module "tenant_repository" {
     repository = try(var.tenant_repository.template.repository, null)
   } : null
 
-  # Branch rules
-  allow_auto_merge       = true
-  allow_merge_commit     = true
-  allow_rebase_merge     = true
-  allow_squash_merge     = true
+  ## Allow auto merge, merge commit, rebase merge, and squash merge
+  allow_auto_merge = true
+  # Allow merge commit to be used
+  allow_merge_commit = true
+  # Allow rebase merge to be used
+  allow_rebase_merge = true
+  # Allow squash merge to be used
+  allow_squash_merge = true
+  # Delete the branch on merge
   delete_branch_on_merge = true
+
+  ## Branch protection rules
   branch_protection = {
     main = {
       # Disable force pushes, deletions, and merge commits
@@ -94,7 +100,7 @@ module "network" {
 ## Provision an EKS container platform to deploy workloads
 module "eks" {
   source  = "appvia/eks/aws"
-  version = "1.2.4"
+  version = "1.2.6"
 
   access_entries         = local.access_entries
   cluster_name           = var.cluster_name
@@ -107,46 +113,26 @@ module "eks" {
   tags                   = local.tags
   vpc_id                 = local.vpc_id
 
-  addons = {
-    aws-ebs-csi-driver = {
-      addon_version = "v1.51.0-eksbuild.1"
-    }
-  }
-
-  ## Hub-Spoke configuration - if the cluster is part of a hub-spoke architecture, update the
-  ## following variables
+  ## Hub-Spoke configuration - if the cluster is part of a hub-spoke architecture,
+  ## update the following variables
   hub_account_id   = var.hub_account_id
   hub_account_role = var.hub_account_role
 
-  ## Certificate manager configuration
-  cert_manager = {
-    enabled          = true
-    namespace        = "cert-manager"
-    service_account  = "cert-manager"
-    hosted_zone_arns = ["arn:aws:route53:::hostedzone/*"]
-  }
-
   ## ArgoCD configuration
   argocd = {
-    enabled         = true
-    namespace       = "argocd"
-    service_account = "argocd"
+    enable = true
   }
-
+  ## Cert-manager configuration
+  cert_manager = {
+    enable = true
+  }
+  ## External Secrets configuration
   external_secrets = {
-    enabled              = true
-    namespace            = "external-secrets"
-    service_account      = "external-secrets"
-    secrets_manager_arns = ["arn:aws:secretsmanager:::secret/*"]
-    ssm_parameter_arns   = ["arn:aws:ssm:::parameter/eks/*"]
+    enable = true
   }
-
   ## External DNS configuration
   external_dns = {
-    enabled          = true
-    namespace        = "external-dns"
-    service_account  = "external-dns"
-    hosted_zone_arns = ["arn:aws:route53:::hostedzone/*"]
+    enable = true
   }
 
   depends_on = [
@@ -158,7 +144,7 @@ module "eks" {
 module "platform" {
   count   = var.enable_platform ? 1 : 0
   source  = "appvia/eks/aws//modules/platform"
-  version = "1.2.4"
+  version = "1.2.6"
 
   ## Name of the cluster
   cluster_name = module.eks.cluster_name
