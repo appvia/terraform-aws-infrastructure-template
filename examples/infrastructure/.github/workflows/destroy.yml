@@ -25,7 +25,7 @@ permissions:
 
 jobs:
   destroy:
-    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-destroy.yml@main
+    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-destroy.yml@2a4cf9fe2d9d3ea45b1ad9ed4b5b59d0b50892e1 # main
     name: Terraform Destroy
     secrets:
       actions-id: "${{ secrets.ORG_ACTIONS_APP_ID }}"

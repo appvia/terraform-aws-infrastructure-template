@@ -25,7 +25,9 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
-.terraform.lock.hcl
+
+# Note: .terraform.lock.hcl is intentionally NOT ignored. This is a root configuration
+# template, so dependency lock files should be committed for reproducible provider versions.
 
 # Ignore vim swap files
 *.swp
