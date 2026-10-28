@@ -30,10 +30,10 @@ jobs:
   #
   #    steps:
   #      - name: Checkout Repository
-  #        uses: actions/checkout@v4
+  #        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
   #
   #      - name: Terraform Plan and Apply
-  #        uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@main
+  #        uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@2a4cf9fe2d9d3ea45b1ad9ed4b5b59d0b50892e1 # main
   #        with:
   #          aws-account-id: ${{ matrix.account.account-id }}
   #          enable-private-access: true
@@ -41,7 +41,7 @@ jobs:
   #          terraform-dir: terraform
 
   terraform:
-    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@main
+    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@2a4cf9fe2d9d3ea45b1ad9ed4b5b59d0b50892e1 # main
     name: Terraform Plan and Apply
     secrets:
       actions-id: "${{ secrets.ORG_ACTIONS_APP_ID }}"
@@ -62,7 +62,7 @@ jobs:
 ## Uncomment this to run the workflow for the production account
 #
 #  terraform-prod:
-#    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@main
+#    uses: appvia/appvia-cicd-workflows/.github/workflows/terraform-plan-and-apply-aws.yml@2a4cf9fe2d9d3ea45b1ad9ed4b5b59d0b50892e1 # main
 #    name: Terraform Plan and Apply
 #    secrets:
 #      actions-id: "${{ secrets.ORG_ACTIONS_APP_ID }}"
